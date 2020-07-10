@@ -70,9 +70,6 @@
     #movies .col-md-3  .image{
         height: 300px;
     }
-    .main{
-        width: 30%;
-    }
 }
 
 @media(max-width: 960px){

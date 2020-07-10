@@ -1,76 +1,114 @@
+let oldSearchTitle = "";
+let oldSearchResults;
+let movieYears = {};
+let yearsForFiltering = {};
+let moviesFilteredByYear;
+let checkboxesVisible = false;
+
+// Show movies on submit
 $(document).ready(() => {
     $('#searchForm').on('submit', (e) => {
         const searchTitle = $('#searchTitle').val();
-        const searchYear = $('#searchYear').val();
-
-        let isValidYear = true;
-
-
-        if(searchYear !== ""){
-            isValidYear = /^[12](?<=1)[89]|(?<=2)[0]\d{2}$/.test(searchYear);
-        }
         
+        if(oldSearchTitle == searchTitle){
+            console.log(typeof oldSearchResults);
+            console.log("searching for the same thing?");
 
-        if(isValidYear){
-            if(searchTitle !== "")
-                getMovies(searchTitle, searchYear);
+            showMovies(oldSearchResults);
+        }else{
+            getMovies(searchTitle);
         }
-        else{
-            
-            $('#alert').html(`
-            <div class="alert alert-dismissible fade show alert-danger my-2">
-                <strong>Oops!</strong> Please check you search parameters and try submitting again.
-            </div>
-            `);
-
-            setTimeout(() => {
-                $(".alert").alert('close');
-            }, 3000);
-        }
-
-        
+  
         e.preventDefault();
     });
 });
 
-
-function getMovies(searchTitle, searchYear = ""){
+// Get movies from api using title
+function getMovies(searchTitle){
+    oldSearchTitle = searchTitle;
     
-    axios.get('http://www.omdbapi.com/?apikey=ff0be5a3&s='+searchTitle+"&y="+searchYear)
+    axios.get('http://www.omdbapi.com/?apikey=ff0be5a3&s='+searchTitle)
         .then((response) => {
             console.log(response);
             const movies = response.data.Search;
-            $('.main').css("margin-top", "5%");
-            $('hr').css("display", "block");
-            let output = "";
-            let img = "";
+            oldSearchResults = movies;
+            // Add all available years to object
             $.each(movies, (index, movie) => {
-                output += `
-                    <div class="poster col-md-3 mt-3" onclick="movieSelected('${movie.imdbID}')">
-                        <div class="card border-info mb-3" style="width: 13rem;">
-                        <img class="image img-thumbnail" src="${movie.Poster}">
-                        <div class="middle btn-info">
-                            <h4 class="title">${movie.Title}<br>${movie.Year}</h4>
-                        </div>
-                        </div>
-                    </div>
-                `;
+                movieYears[movie.Year] = movie.Year;
             });
-
-            $('#movies').html(output);
+            showMovies(movies);          
         })
         .catch((err) => {
             console.log(err); 
         });
 }
 
+// Display movies on page
+function showMovies(movies){
+    $('.main').css("margin-top", "5%");
+    $('hr').css("display", "block");
+    let output = "";
+    let img = "";
+    $.each(movies, (index, movie) => {
+        output += `
+            <div class="poster col-md-3 mt-3" onclick="movieSelected('${movie.imdbID}')">
+                <div class="card border-info mb-3" style="width: 13rem;">
+                <img class="image img-thumbnail" src="${movie.Poster}">
+                <div class="middle btn-info">
+                    <h4 class="title">${movie.Title}<br>${movie.Year}</h4>
+                </div>
+                </div>
+            </div>
+        `;
+    });
 
+    $('#movies').html(output);
+    if(!checkboxesVisible){
+        showCheckbox();
+    }
+}
+
+// Filter movies by year
+function filterMoviesByYear(filterYear){
+    
+    if(yearsForFiltering[filterYear]){
+        delete yearsForFiltering[filterYear];
+    }else{
+        yearsForFiltering[filterYear] = filterYear;
+    }
+
+    moviesFilteredByYear = oldSearchResults.filter((movie) => {
+        return (movie.Year in yearsForFiltering);
+    });
+
+    showMovies(moviesFilteredByYear);
+
+}
+
+// Show checkboxes
+function showCheckbox(){
+    let chkbox = "";
+    $.each(movieYears, (index, year) => {
+
+        chkbox += `
+        <div class="form-check col-md-4 col-sm-6 p-1">
+            <input type="checkbox" class="form-check-input" id="year" onchange="filterMoviesByYear(${year})">
+            <label class="form-check-label" for="year">${(year.length > 4 ? ("'" + year.substring(2, 4) + '-' + year.slice(-2)) : year)}</label>
+        </div>
+    `
+    });
+    $('#yearCheckboxes').html(chkbox);
+    checkboxesVisible = true;
+}
+
+// Get id of selected movie and save it as a session
 function movieSelected(id){
     sessionStorage.setItem('movieId', id);
     window.location = 'movie.html';
     return false;
 }
 
+// Get single movie details using id saved session
 function getMovie(){
     const movieId =  sessionStorage.getItem('movieId');
     console.log(movieId);

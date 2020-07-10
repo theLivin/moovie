@@ -5,7 +5,11 @@
 .main{
     margin-top: 15%;
     text-align: center;
-    height: 50%;
+    width: 30%;
+}
+
+#checkboxes{
+    width: 100%;
 }
 
 .logo{

@@ -28,15 +28,14 @@
         <div class="main">
           <h1 class="display-3 brand text-info">MooV!e</h1>
           <form class="my-2 my-lg-0" id="searchForm">
-            <div class="form-row">
-              <div class="col-sm-9 mt-1">
-                <input id="searchTitle" class="form-control" type="text" placeholder="Title">
-              </div>
-              <div class="col-sm-3 mt-1">
-                <input id="searchYear" class="form-control" type="text" placeholder="Year">
-              </div>
+            <div class="row">
+              <input id="searchTitle" class="form-control" type="text" placeholder="Title">
+              <button class="mt-2 btn btn-info btn-block" id="searchBtn">search</button>
             </div>
-            <button class="mt-2 btn btn-info btn-block" id="searchBtn">search</button>
+
+            <div class="row mt-2 mx-auto" id="yearCheckboxes">
+            </div>
+            <!-- <input id="searchYear" class="form-control mt-2" type="number" min="1888" max="2020" placeholder="Year"> -->
           </form>
           <div id="alert"></div>
         </div>
@@ -46,7 +45,7 @@
 
 
     <div class="container">
-      <div id="movies" class="row card-deck">        
+      <div id="movies" class="row card-deck m-md-1">        
       </div>
     </div>
   

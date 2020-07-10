@@ -81,7 +81,11 @@ function filterMoviesByYear(filterYear){
         return (movie.Year in yearsForFiltering);
     });
 
-    showMovies(moviesFilteredByYear);
+    if(Object.keys(yearsForFiltering).length <= 0){
+        showMovies(oldSearchResults);
+    }else{
+        showMovies(moviesFilteredByYear);
+    }
 
 }
 

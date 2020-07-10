@@ -16,6 +16,12 @@ $(document).ready(() => {
 
             showMovies(oldSearchResults);
         }else{
+            // Remove old chechboxes
+            checkboxesVisible = false;
+            $('#yearCheckboxes').empty();
+            movieYears = {};
+
+            // Get movies from api
             getMovies(searchTitle);
         }
   
@@ -36,7 +42,7 @@ function getMovies(searchTitle){
             $.each(movies, (index, movie) => {
                 movieYears[movie.Year] = movie.Year;
             });
-            showMovies(movies);          
+            showMovies(movies);        
         })
         .catch((err) => {
             console.log(err); 
@@ -63,6 +69,8 @@ function showMovies(movies){
     });
 
     $('#movies').html(output);
+
+    // Show year checkboxes if new search is made
     if(!checkboxesVisible){
         showCheckbox();
     }
@@ -94,12 +102,15 @@ function showCheckbox(){
     let chkbox = "";
     $.each(movieYears, (index, year) => {
 
-        chkbox += `
-        <div class="form-check col-md-4 col-sm-6 p-1">
-            <input type="checkbox" class="form-check-input" id="year" onchange="filterMoviesByYear(${year})">
-            <label class="form-check-label" for="year">${(year.length > 4 ? ("'" + year.substring(2, 4) + '-' + year.slice(-2)) : year)}</label>
-        </div>
-    `
+        if(year.length <= 4){
+            chkbox += `
+            <div class="form-check col-md-4 col-sm-6 p-1">
+                <input type="checkbox" class="form-check-input" id="year" onchange="filterMoviesByYear(${year})">
+                <label class="form-check-label" for="year">${year}</label>
+            </div>
+            `
+        }
+
     });
     $('#yearCheckboxes').html(chkbox);
     checkboxesVisible = true;
